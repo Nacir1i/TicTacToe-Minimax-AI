@@ -3,14 +3,22 @@ class bot {
     this.player = player;
   }
 
-  playRandomMoves() {
+  playMove() {
+    if (isHard) {
+      this.bestMove();
+    } else {
+      this.randomMoves();
+    }
+  }
+
+  randomMoves() {
     const randomMove =
       availableMoves[Math.floor(Math.random() * availableMoves.length)];
 
     board.board[randomMove].placeMark(this.player);
   }
 
-  playMove() {
+  bestMove() {
     let bestScore = -Infinity;
     let bestMove;
     for (let i = 0; i < board.board.length; i++) {
@@ -27,7 +35,7 @@ class bot {
     board.board[bestMove].placeMark("x");
   }
 
-  minimax(moves, depth, isMax) {
+  minimax(moves, depth, isMax, memo = {}) {
     const gameState = isGameOver();
     if (gameState) {
       if (gameState === "x") {
@@ -44,7 +52,7 @@ class bot {
       for (let i = 0; i < moves.length; i++) {
         if (moves[i].player === "none") {
           moves[i].placeMark("x");
-          const score = this.minimax(moves, depth++, false);
+          const score = this.minimax(moves, depth++, false, memo);
           bestScore = Math.max(score, bestScore);
           moves[i].undoMark();
         }
@@ -55,7 +63,7 @@ class bot {
       for (let i = 0; i < moves.length; i++) {
         if (moves[i].player === "none") {
           moves[i].placeMark("o");
-          const score = this.minimax(moves, depth++, true);
+          const score = this.minimax(moves, depth++, true, memo);
           bestScore = Math.min(score, bestScore);
           moves[i].undoMark();
         }
